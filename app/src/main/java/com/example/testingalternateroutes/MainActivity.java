@@ -2,10 +2,13 @@ package com.example.testingalternateroutes;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -27,6 +30,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -50,8 +55,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         destinationAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
         destinationSpinner.setAdapter(destinationAdapter);
 
-        destinationAdapter.add("University of St. La Salle");
-        destinationAdapter.add("Ayala Malls Capitol Center");
+        destinationAdapter.add("Northbound Terminal");
+        destinationAdapter.add("San-Agustin Route");
         destinationAdapter.add("SM City Bacolod");
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -103,6 +108,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        selectRouteSpinner();
+
         // Initialize the directionHelper object
         directionHelper = new DirectionHelper(mMap, this);
         hideLoadingScreen();
@@ -140,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
 
                     // Set the destination based on the selected option
-                    LatLng destination = getDestinationLatLng(selectedDestination);
+                    LatLng destination = getDestinationLatLng(selectedDestination, origin);
 
                     // Call showDirections() with the updated origin and destination
                     directionHelper.showDirections(origin, destination);
@@ -152,12 +159,55 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         client.requestLocationUpdates(locationRequest, locationCallback, null);
     }
 
-    private LatLng getDestinationLatLng(String selectedDestination) {
-        // Implement logic to return the LatLng coordinates for the selected destination
+    private void selectRouteSpinner() {
+        destinationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            private boolean firstSelection = true;
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!firstSelection) {
+                    String selectedValue = parent.getItemAtPosition(position).toString();
+                    MarkerOptions markerOptions = new MarkerOptions();
+
+                    if (!TextUtils.isEmpty(selectedValue)) {
+                        switch (selectedValue) {
+                            case "Northbound Terminal":
+                                LatLng[] nboundPointspoints = LatLngData.getLatLngNboundPoints();
+                                mMap.clear();
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(nboundPointspoints[0], 12));
+                                mMap.addMarker(new MarkerOptions().position(nboundPointspoints[0]).title("Northbound Terminal"));
+
+                                PolylineOptions polylineOptions = new PolylineOptions().width(10f).color(Color.RED);
+                                for (LatLng point : nboundPointspoints) {
+                                    polylineOptions.add(point);
+                                }
+                                Polyline polyline = mMap.addPolyline(polylineOptions);
+                                // Add a marker at the end of the points
+                                LatLng lastPoint = nboundPointspoints[nboundPointspoints.length - 1];
+                                mMap.addMarker(new MarkerOptions().position(lastPoint).title("End Point"));
+                                break;
+
+                            case "San-Agustin Route":
+                                LatLng[] points = LatLngData.getLatLngSanagPoints();
+                        }
+                    }
+                } else {
+                    firstSelection = false;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private LatLng getDestinationLatLng(String selectedDestination, LatLng userLocation) {
+        LatLng nearestCoordinate = LatLngData.getNearestCoordinate(userLocation);
         LatLng coordinates;
         switch (selectedDestination) {
-            case "University of St. La Salle":
-                coordinates = new LatLng(10.679891694036304, 122.96120524406435);
+            case "Northbound Terminal":
+                coordinates = nearestCoordinate;
                 break;
             case "Ayala Malls Capitol Center":
                 coordinates = new LatLng(10.676554819361021, 122.95060515403749);
@@ -172,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         return coordinates;
     }
+
 
     private void showLoadingScreen() {
         findViewById(R.id.loading_screen).setVisibility(View.VISIBLE);
