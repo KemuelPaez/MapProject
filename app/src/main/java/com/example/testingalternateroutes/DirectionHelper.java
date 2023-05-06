@@ -8,6 +8,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.DirectionsApi;
@@ -79,20 +80,86 @@ public class DirectionHelper {
                     }
                 }
                 mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 100));
-
                 mainActivity.hideLoadingScreenAndEnableButton();
 
-                LatLng nearestCoordinate = LatLngData.getNearestCoordinate(origin);
-                if (nearestCoordinate != null) {
-                    // Check if the nearest coordinate is on the Nbound jeepney route
-                    if (isCoordinateOnNboundRoute(nearestCoordinate)) {
-                        showRouteSuggestionDialog("Northbound");
-                    }
-                }
+                getNearestRouteChecker(origin);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void getNearestRouteChecker(LatLng destination){
+        LatLng nearestCoordinate = LatLngData.getNearestCoordinate(destination);
+        PolylineOptions polylineOptions = new PolylineOptions().width(10f).color(Color.RED);
+
+        if (nearestCoordinate != null) {
+            // Check if the nearest coordinate is on the nearest point of route & display the route
+            if (isCoordinateOnNboundRoute(nearestCoordinate)) {
+                showRouteSuggestionDialog("Northbound");
+                LatLng[] nboundPoints = LatLngData.getLatLngNboundPoints();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(nboundPoints[0], 12));
+                mMap.addMarker(new MarkerOptions().position(nboundPoints[0]).title("Northbound Terminal"));
+
+                for (LatLng point : nboundPoints) {
+                    polylineOptions.add(point);
+                }
+
+                Polyline polyline0 = mMap.addPolyline(polylineOptions);
+            } else if (isCoordinateOnSanagRoute(nearestCoordinate)){
+                showRouteSuggestionDialog("San-Agustin");
+            } else if (isCoordinateOnBataRoute(nearestCoordinate)){
+                showRouteSuggestionDialog("Bata");
+            }
+        }
+    }
+
+    private void showRouteSuggestionDialog(String routeName) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
+        builder.setTitle("Route Suggestion")
+                .setMessage("We suggest taking the " + routeName + " jeepney route. The red line routes indicates the route of the "+ routeName
+                        +" jeepneys. Possible double ride if you want to get to your specific location.")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .setCancelable(false)
+                .show();
+    }
+    private boolean isCoordinateOnNboundRoute(LatLng coordinate) {
+        LatLng[] nboundCoordinates = LatLngData.getLatLngNboundPoints();
+
+        for (LatLng point : nboundCoordinates) {
+            if (areCoordinatesEqual(point, coordinate)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    private boolean isCoordinateOnSanagRoute(LatLng coordinate) {
+        LatLng[] sanagCoordinates = LatLngData.getLatLngSanagPoints();
+
+        for (LatLng point : sanagCoordinates) {
+            if (areCoordinatesEqual(point, coordinate)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    private boolean isCoordinateOnBataRoute(LatLng coordinate) {
+        LatLng[] bataCoordinates = LatLngData.getLatLngBataPoints();
+
+        for (LatLng point : bataCoordinates) {
+            if (areCoordinatesEqual(point, coordinate)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private int getShortestRouteIndex(DirectionsRoute[] routes) {
@@ -112,50 +179,10 @@ public class DirectionHelper {
         return shortestRouteIndex;
     }
 
-    private boolean isCoordinateOnNboundRoute(LatLng coordinate) {
-        LatLng[] nboundCoordinates = LatLngData.getLatLngNboundPoints();
-
-        for (LatLng point : nboundCoordinates) {
-            if (areCoordinatesEqual(point, coordinate)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private boolean areCoordinatesEqual(LatLng coordinate1, LatLng coordinate2) {
         double latitudeDifference = Math.abs(coordinate1.latitude - coordinate2.latitude);
         double longitudeDifference = Math.abs(coordinate1.longitude - coordinate2.longitude);
 
         return latitudeDifference < 1e-6 && longitudeDifference < 1e-6;
     }
-
-    private void showRouteSuggestionDialog(String routeName) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
-        builder.setTitle("Route Suggestion")
-                .setMessage("We suggest taking the " + routeName + " jeepney route. The red line routes indicates the route of the "+ routeName
-                        +" jeepneys. Possible double ride if you want to get to your specific location.")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Handle the OK button click if needed
-                    }
-                })
-                .setCancelable(false)
-                .show();
-    }
 }
-
-
-//    private void clearDirections() {
-//        if (polylines != null) {
-//            for (Polyline polyline : polylines) {
-//                if (polyline != null) {
-//                    polyline.remove();
-//                }
-//            }
-//        }
-//        polylines = null; // Reset the polylines array to null
-//        mMap.clear();
-//    }
