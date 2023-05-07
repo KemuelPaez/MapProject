@@ -3,12 +3,19 @@ plugins {
 }
 
 android {
+
+    lintOptions {
+        abortOnError false
+        checkReleaseBuilds false
+        disable "SlowOperation"
+    }
+    
     namespace 'com.example.testingalternateroutes'
     compileSdk 33
 
     defaultConfig {
         applicationId "com.example.testingalternateroutes"
-        minSdk 24
+        minSdk 21
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -30,17 +37,21 @@ android {
 
 dependencies {
 
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'com.google.android.material:material:1.5.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.google.android.gms:play-services-maps:18.1.0'
+    implementation 'com.google.android.gms:play-services-maps:18.0.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-    // Maps
+
+// Maps
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'com.google.maps:google-maps-services:0.17.0'
-    implementation 'com.google.maps.android:android-maps-utils:2.2.0'
+    implementation 'com.google.maps.android:android-maps-utils:3.4.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+
+
 }

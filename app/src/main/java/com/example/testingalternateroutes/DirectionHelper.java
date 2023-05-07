@@ -1,14 +1,16 @@
 package com.example.testingalternateroutes;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.graphics.Color;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.Dash;
+import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.DirectionsApi;
@@ -20,12 +22,13 @@ import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.TravelMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DirectionHelper {
 
-    private GoogleMap mMap;
-    private MainActivity mainActivity;
+    private final GoogleMap mMap;
+    private final MainActivity mainActivity;
     private Polyline[] polylines;
 
     public DirectionHelper(GoogleMap googleMap, MainActivity activity) {
@@ -34,6 +37,7 @@ public class DirectionHelper {
     }
 
     public void showDirections(LatLng origin, LatLng destination) {
+
         GeoApiContext context = new GeoApiContext.Builder()
                 .apiKey("AIzaSyAioKwOOSrMpBuYj80F-eIsquHfaXMlOtI")
                 .build();
@@ -44,6 +48,12 @@ public class DirectionHelper {
                 .mode(TravelMode.DRIVING)
                 .alternatives(false)
                 .region("ph");
+
+        List<PatternItem> pattern = Arrays.asList(
+                new Dash(10),    // 10px dash
+                new Gap(20),     // 20px gap
+                new Dash(10),    // 10px dash
+                new Gap(20));    // 20px gap
 
         try {
             DirectionsResult result = request.await();
@@ -60,10 +70,11 @@ public class DirectionHelper {
 
                     Polyline polyline = mMap.addPolyline(new PolylineOptions()
                             .addAll(path)
-                            .width(10f));
+                            .width(10f)
+                            .pattern(pattern));
 
                     if (i == shortestRouteIndex) {
-                        polyline.setColor(Color.TRANSPARENT);
+                        polyline.setColor(Color.BLUE);
                         polyline.setZIndex(1);
                     } else {
                         polyline.setColor(Color.GRAY);
@@ -105,11 +116,35 @@ public class DirectionHelper {
                     polylineOptions.add(point);
                 }
 
-                Polyline polyline0 = mMap.addPolyline(polylineOptions);
+                mMap.addPolyline(polylineOptions);
+
             } else if (isCoordinateOnSanagRoute(nearestCoordinate)){
                 showRouteSuggestionDialog("San-Agustin");
+                LatLng[] sanagPoints = LatLngData.getLatLngSanagPoints();
+                //  mMap.clear();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sanagPoints[0], 12));
+                mMap.addMarker(new MarkerOptions().position(sanagPoints[0]).title("San-Agustin Start"));
+
+                for (LatLng point : sanagPoints) {
+                    polylineOptions.add(point);
+                }
+                mMap.addPolyline(polylineOptions);
+
             } else if (isCoordinateOnBataRoute(nearestCoordinate)){
                 showRouteSuggestionDialog("Bata");
+
+                LatLng[] bataPoints = LatLngData.getLatLngBataPoints();
+                // mMap.clear();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(bataPoints[0], 12));
+                mMap.addMarker(new MarkerOptions().position(bataPoints[0]).title("Bata Start"));
+
+                for (LatLng point : bataPoints) {
+                    polylineOptions.add(point);
+                }
+                mMap.addPolyline(polylineOptions);
+                
+            } else {
+                return;
             }
         }
     }
@@ -119,11 +154,8 @@ public class DirectionHelper {
         builder.setTitle("Route Suggestion")
                 .setMessage("We suggest taking the " + routeName + " jeepney route. The red line routes indicates the route of the "+ routeName
                         +" jeepneys. Possible double ride if you want to get to your specific location.")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                .setPositiveButton("OK", (dialog, which) -> {
 
-                    }
                 })
                 .setCancelable(false)
                 .show();

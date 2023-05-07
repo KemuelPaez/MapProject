@@ -451,8 +451,7 @@ public class LatLngData {
         double shortestDistance = calculateDistance(userLocation, nearestCoordinate);
 
         for (LatLng[] coordinates : routeCoordinates) {
-            for (int i = 0; i < coordinates.length; i++) {
-                LatLng coordinate = coordinates[i];
+            for (LatLng coordinate : coordinates) {
                 double distance = calculateDistance(userLocation, coordinate);
 
                 if (distance < shortestDistance) {
@@ -481,9 +480,7 @@ public class LatLngData {
                 * Math.sin(dLon / 2) * Math.sin(dLon / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-        double distance = earthRadius * c;
-
-        return distance;
+        return earthRadius * c;
     }
 
 

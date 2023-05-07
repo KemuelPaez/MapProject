@@ -18,7 +18,7 @@
     <Spinner
         android:id="@+id/spinner_destination"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
@@ -30,24 +30,24 @@
         android:id="@+id/btn_directions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="8dp"
-        android:text="Get Directions" />
+        android:text="@string/get_direction" />
 
     <Button
         android:id="@+id/btn_clear"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="48dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="164dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="162dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="59dp"
-        android:text="Clear" />
+        android:text="@string/clear" />
 
     <FrameLayout
         android:id="@+id/loading_screen"
@@ -57,26 +57,26 @@
         android:visibility="gone">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
 
             <ProgressBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:indeterminate="true"
-                android:progressTint="@color/blue"/>
+                android:progressTint="@color/blue" />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Loading it may take a while. . ."
                 android:id="@+id/loading_txtview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Loading it may take a while. . ."
                 android:textColor="@color/white"
-                android:textSize="20sp"
-                android:gravity="center" />
+                android:textSize="20sp" />
 
         </LinearLayout>
 
