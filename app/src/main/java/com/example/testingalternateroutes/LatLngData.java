@@ -3,6 +3,68 @@ package com.example.testingalternateroutes;
 import com.google.android.gms.maps.model.LatLng;
 
 public class LatLngData {
+
+    // Remember to add every new points method into getNearestCoordinate method
+    public static LatLng getNearestCoordinate(LatLng userLocation) {
+        // An array of arrays, where each sub-array represents the coordinates of a different route
+        LatLng[][] routeCoordinates = {
+                getLatLngNboundPoints(),
+                getLatLngSanagPoints(),
+                getLatLngBataPoints(),
+                // Add new route coordinates here
+        };
+
+        // Check if there are any route coordinates
+        boolean hasCoordinates = false;
+        for (LatLng[] coordinates : routeCoordinates) {
+            if (coordinates.length > 0) {
+                hasCoordinates = true;
+                break;
+            }
+        }
+
+        if (!hasCoordinates) {
+            return null; // Return null if there are no route coordinates
+        }
+
+        // Initialize the nearestCoordinate and shortestDistance variables to the first coordinate in the first route
+        LatLng nearestCoordinate = routeCoordinates[0][0];
+        double shortestDistance = calculateDistance(userLocation, nearestCoordinate);
+
+        // Iterate through all the route coordinates and find the nearest one to the user's location
+        for (LatLng[] coordinates : routeCoordinates) {
+            for (LatLng coordinate : coordinates) {
+                double distance = calculateDistance(userLocation, coordinate);
+
+                if (distance < shortestDistance) {
+                    shortestDistance = distance;
+                    nearestCoordinate = coordinate;
+                }
+            }
+        }
+
+        return nearestCoordinate;
+    }
+    private static double calculateDistance(LatLng point1, LatLng point2) {
+        // using Haversine formula:
+        double lat1 = Math.toRadians(point1.latitude);
+        double lon1 = Math.toRadians(point1.longitude);
+        double lat2 = Math.toRadians(point2.latitude);
+        double lon2 = Math.toRadians(point2.longitude);
+
+        double earthRadius = 6371; // Radius of the Earth in kilometers
+        double dLat = lat2 - lat1;
+        double dLon = lon2 - lon1;
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(lat1) * Math.cos(lat2)
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return earthRadius * c;
+    }
+
+    // Method of manually plotted coordinates to be connected with polylines.
     public static LatLng[] getLatLngNboundPoints() {
         return new LatLng[]{
                 // northbound
@@ -423,64 +485,6 @@ public class LatLngData {
                 new LatLng(10.676437, 122.953200),
                 new LatLng(10.676574, 122.953243)
         };
-    }
-
-    // Remember to add every new points method into getNearestCoordinate method
-    public static LatLng getNearestCoordinate(LatLng userLocation) {
-        LatLng[][] routeCoordinates = {
-                getLatLngNboundPoints(),
-                getLatLngSanagPoints(),
-                getLatLngBataPoints(),
-                // Add new route coordinates here
-        };
-
-        boolean hasCoordinates = false;
-
-        for (LatLng[] coordinates : routeCoordinates) {
-            if (coordinates.length > 0) {
-                hasCoordinates = true;
-                break;
-            }
-        }
-
-        if (!hasCoordinates) {
-            return null; // Return null if there are no route coordinates
-        }
-
-        LatLng nearestCoordinate = routeCoordinates[0][0];
-        double shortestDistance = calculateDistance(userLocation, nearestCoordinate);
-
-        for (LatLng[] coordinates : routeCoordinates) {
-            for (LatLng coordinate : coordinates) {
-                double distance = calculateDistance(userLocation, coordinate);
-
-                if (distance < shortestDistance) {
-                    shortestDistance = distance;
-                    nearestCoordinate = coordinate;
-                }
-            }
-        }
-
-        return nearestCoordinate;
-    }
-
-    private static double calculateDistance(LatLng point1, LatLng point2) {
-        // using Haversine formula:
-        double lat1 = Math.toRadians(point1.latitude);
-        double lon1 = Math.toRadians(point1.longitude);
-        double lat2 = Math.toRadians(point2.latitude);
-        double lon2 = Math.toRadians(point2.longitude);
-
-        double earthRadius = 6371; // Radius of the Earth in kilometers
-        double dLat = lat2 - lat1;
-        double dLon = lon2 - lon1;
-
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(lat1) * Math.cos(lat2)
-                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        return earthRadius * c;
     }
 
 

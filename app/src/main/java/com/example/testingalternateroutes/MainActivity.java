@@ -2,7 +2,6 @@ package com.example.testingalternateroutes;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -29,16 +28,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.PolylineOptions;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private Spinner destinationSpinner;
     private Button btnDirections, btnClear;
-
-    private FusedLocationProviderClient fusedLocationProviderClient;
-    private LocationCallback locationCallback;
 
     private DirectionHelper directionHelper;
 
@@ -54,10 +49,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         ArrayAdapter<String> destinationAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
         destinationSpinner.setAdapter(destinationAdapter);
 
+        // Placeholder for hotspot destinations
         destinationAdapter.add("Northbound Terminal");
         destinationAdapter.add("San-Agustin Route");
         destinationAdapter.add("Bata Route");
 
+        // Call the map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         if (mapFragment != null) {
@@ -70,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 showLoadingScreen();
                 btnDirections.setEnabled(false);
 
+                // check if location permission is enable/disabled
                 if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
                 } else {
@@ -86,6 +84,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(@NonNull GoogleMap googleMap) {
         Log.d("Map", "Map is ready");
         // Set camera bounds in Bacolod
+        LatLngBounds BACOLOD_BOUNDS = new LatLngBounds(
+                new LatLng(10.5809, 122.9014),  // Southwest corner
+                new LatLng(10.7278, 123.0105)   // Northeast corner
+        );
         double bacolodMinLatitude = 10.6289;
         double bacolodMaxLatitude = 10.7213;
         double bacolodMinLongitude = 122.9191;
@@ -107,12 +109,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 new LatLng(bacolodMinLatitude, bacolodMinLongitude),
                 new LatLng(bacolodMaxLatitude, bacolodMaxLongitude)
         );
+        mMap.setLatLngBoundsForCameraTarget(BACOLOD_BOUNDS);
+        mMap.setMinZoomPreference(12);
+        mMap.setMaxZoomPreference(18);
 
         // Set the camera position to show the bounds while waiting for the map to load
         mMap.setOnMapLoadedCallback(() -> mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bacolodBounds, 100)));
 
         btnClear.setOnClickListener(v -> mMap.clear());
 
+        // Display the spinner
         selectRouteSpinner();
 
         // Initialize the directionHelper object
@@ -124,7 +130,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d("Location", "Getting current location");
         showLoadingScreen();
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        // FusedLocation is enabled in order to track the users current position on the map
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -132,7 +139,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LocationRequest locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-        locationCallback = new LocationCallback() {
+        // Set the origin based on the current location
+        // Set the destination based on the selected option
+        LocationCallback locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 Location location = locationResult.getLastLocation();
@@ -146,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     // Set the destination based on the selected option
                     LatLng destination = getDestinationLatLng(selectedDestination, origin);
 
-                    // Call showDirections() with the updated origin and destination
+                    // Call showDirections()
                     directionHelper.showDirections(origin, destination);
                 }
 
@@ -157,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void selectRouteSpinner() {
+        // Method for the hotspot places in bacolod and show them on the map
         destinationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             private boolean firstSelection = true;
 
@@ -164,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (!firstSelection) {
                     String selectedValue = parent.getItemAtPosition(position).toString();
-                    PolylineOptions polylineOptions = new PolylineOptions().width(10f).color(Color.RED);
+                    // PolylineOptions polylineOptions = new PolylineOptions().width(10f).color(Color.RED);
 
                     if (!TextUtils.isEmpty(selectedValue)) {
                         switch (selectedValue) {
@@ -194,6 +204,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private LatLng getDestinationLatLng(String selectedDestination, LatLng userLocation) {
+        // Method for getting the destination based on the users selection
+        // Then pass it to the DirectionHelper class
         LatLng nearestCoordinate = LatLngData.getNearestCoordinate(userLocation);
         LatLng coordinates;
         if (selectedDestination.equals("Northbound Terminal") ||
@@ -207,14 +219,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return coordinates;
     }
 
+    // hide/show Loading screen methods
     private void showLoadingScreen() {
         findViewById(R.id.loading_screen).setVisibility(View.VISIBLE);
     }
-
     private void hideLoadingScreen() {
         findViewById(R.id.loading_screen).setVisibility(View.GONE);
     }
-
     public void hideLoadingScreenAndEnableButton() {
         hideLoadingScreen();
         btnDirections.setEnabled(true);
