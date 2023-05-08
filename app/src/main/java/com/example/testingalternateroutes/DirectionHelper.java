@@ -9,7 +9,6 @@ import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -98,8 +97,8 @@ public class DirectionHelper {
         // decode the polylines on the array
         List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(encodedPath);
         List<LatLng> path = new ArrayList<>();
-        for (com.google.maps.model.LatLng latLng : decodedPath) {
-            path.add(new LatLng(latLng.lat, latLng.lng));
+        for (com.google.maps.model.LatLng LatLng : decodedPath) {
+            path.add(new LatLng(LatLng.lat, LatLng.lng));
         }
         return path;
     }
@@ -142,7 +141,6 @@ public class DirectionHelper {
                 showRouteSuggestionDialog("Northbound");
                 LatLng[] nboundPoints = LatLngData.getLatLngNboundPoints();
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(nboundPoints[0], 12));
-                mMap.addMarker(new MarkerOptions().position(nboundPoints[0]).title("Northbound Terminal"));
 
                 for (LatLng point : nboundPoints) {
                     polylineOptions.add(point);
@@ -155,7 +153,6 @@ public class DirectionHelper {
                 LatLng[] sanagPoints = LatLngData.getLatLngSanagPoints();
                 //  mMap.clear();
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sanagPoints[0], 12));
-                mMap.addMarker(new MarkerOptions().position(sanagPoints[0]).title("San-Agustin Start"));
 
                 for (LatLng point : sanagPoints) {
                     polylineOptions.add(point);
@@ -168,15 +165,72 @@ public class DirectionHelper {
                 LatLng[] bataPoints = LatLngData.getLatLngBataPoints();
                 // mMap.clear();
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(bataPoints[0], 12));
-                mMap.addMarker(new MarkerOptions().position(bataPoints[0]).title("Bata Start"));
 
                 for (LatLng point : bataPoints) {
                     polylineOptions.add(point);
                 }
                 mMap.addPolyline(polylineOptions);
                 
-            } else {
-                return;
+            } else if (isCoordinateOnErorecoRoute(nearestCoordinate)){
+                showRouteSuggestionDialog("Eroreco");
+
+                LatLng[] erorecoPoints = LatLngData.getLatLngErorecoPoints();
+                // mMap.clear();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(erorecoPoints[0], 12));
+
+                for (LatLng point : erorecoPoints) {
+                    polylineOptions.add(point);
+                }
+                mMap.addPolyline(polylineOptions);
+
+            } else if (isCoordinateOnFortuneTownRoute(nearestCoordinate)){
+                showRouteSuggestionDialog("Fortune Town");
+
+                LatLng[] fortunePoints = LatLngData.getLatLngFortuneTownPoints();
+                // mMap.clear();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(fortunePoints[0], 12));
+
+                for (LatLng point : fortunePoints) {
+                    polylineOptions.add(point);
+                }
+                mMap.addPolyline(polylineOptions);
+
+            } else if (isCoordinateOnLasalleRoute(nearestCoordinate)){
+                showRouteSuggestionDialog("Lasalle");
+
+                LatLng[] lasallePoints = LatLngData.getLatLngLasallePoints();
+                // mMap.clear();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lasallePoints[0], 12));
+
+                for (LatLng point : lasallePoints) {
+                    polylineOptions.add(point);
+                }
+                mMap.addPolyline(polylineOptions);
+
+            } else if (isCoordinateOnMansilinganRoute(nearestCoordinate)){
+                showRouteSuggestionDialog("Mansilingan");
+
+                LatLng[] mansiPoints = LatLngData.getLatLngMansilinganPoints();
+                // mMap.clear();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mansiPoints[0], 12));
+
+                for (LatLng point : mansiPoints) {
+                    polylineOptions.add(point);
+                }
+                mMap.addPolyline(polylineOptions);
+
+            } else if (isCoordinateOnAlijisRoute(nearestCoordinate)){
+                showRouteSuggestionDialog("Alijis");
+
+                LatLng[] alijisPoints = LatLngData.getLatLngAlijisPoints();
+                // mMap.clear();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(alijisPoints[0], 12));
+
+                for (LatLng point : alijisPoints) {
+                    polylineOptions.add(point);
+                }
+                mMap.addPolyline(polylineOptions);
+
             }
         }
     }
@@ -228,6 +282,67 @@ public class DirectionHelper {
 
         return false;
     }
+    private boolean isCoordinateOnErorecoRoute(LatLng coordinate) {
+        // check if coordinate is on the bata route
+        LatLng[] erorecoCoordinates = LatLngData.getLatLngErorecoPoints();
+
+        for (LatLng point : erorecoCoordinates) {
+            if (areCoordinatesEqual(point, coordinate)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    private boolean isCoordinateOnFortuneTownRoute(LatLng coordinate) {
+        // check if coordinate is on the bata route
+        LatLng[] furtuneCoordinates = LatLngData.getLatLngFortuneTownPoints();
+
+        for (LatLng point : furtuneCoordinates) {
+            if (areCoordinatesEqual(point, coordinate)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    private boolean isCoordinateOnLasalleRoute(LatLng coordinate) {
+        // check if coordinate is on the bata route
+        LatLng[] lasalleCoordinates = LatLngData.getLatLngLasallePoints();
+
+        for (LatLng point : lasalleCoordinates) {
+            if (areCoordinatesEqual(point, coordinate)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    private boolean isCoordinateOnMansilinganRoute(LatLng coordinate) {
+        // check if coordinate is on the bata route
+        LatLng[] mansiCoordinates = LatLngData.getLatLngMansilinganPoints();
+
+        for (LatLng point : mansiCoordinates) {
+            if (areCoordinatesEqual(point, coordinate)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    private boolean isCoordinateOnAlijisRoute(LatLng coordinate) {
+        // check if coordinate is on the bata route
+        LatLng[] alijisCoordinates = LatLngData.getLatLngAlijisPoints();
+
+        for (LatLng point : alijisCoordinates) {
+            if (areCoordinatesEqual(point, coordinate)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private boolean areCoordinatesEqual(LatLng coordinate1, LatLng coordinate2) {
         // The purpose of this method is likely to compare LatLng coordinates when checking for the nearest route in getNearestRouteChecker() method.
         double latitudeDifference = Math.abs(coordinate1.latitude - coordinate2.latitude);

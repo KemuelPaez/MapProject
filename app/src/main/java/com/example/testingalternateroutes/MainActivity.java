@@ -28,6 +28,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -51,8 +52,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Placeholder for hotspot destinations
         destinationAdapter.add("Northbound Terminal");
-        destinationAdapter.add("San-Agustin Route");
-        destinationAdapter.add("Bata Route");
+        destinationAdapter.add("Southbound Terminal");
+        destinationAdapter.add("University of St. La Salle");
 
         // Call the map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -174,19 +175,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (!firstSelection) {
                     String selectedValue = parent.getItemAtPosition(position).toString();
+
                     // PolylineOptions polylineOptions = new PolylineOptions().width(10f).color(Color.RED);
 
                     if (!TextUtils.isEmpty(selectedValue)) {
                         switch (selectedValue) {
                             case "Northbound Terminal":
+                                LatLng nbound = new LatLng(10.707659998737006, 122.96218916932654);
+                                mMap.clear();
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(nbound,12));
+                                mMap.addMarker(new MarkerOptions().position(nbound).title("Northbound Terminal"));
                                 break;
 
-                            case "San-Agustin Route":
-
+                            case "Southbound Terminal":
+                                LatLng sbound = new LatLng(10.66245869801277, 122.95577918356845);
+                                mMap.clear();
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sbound,12));
+                                mMap.addMarker(new MarkerOptions().position(sbound).title("Southbound Terminal"));
                                 break;
 
-                            case "Bata Route":
-
+                            case "University of St. La Salle":
+                                LatLng usls = new LatLng(10.678726125664706, 122.96262791458304);
+                                mMap.clear();
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(usls,12));
+                                mMap.addMarker(new MarkerOptions().position(usls).title("University of St. La Salle"));
                                 break;
 
                         }
@@ -208,12 +220,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Then pass it to the DirectionHelper class
         LatLng nearestCoordinate = LatLngData.getNearestCoordinate(userLocation);
         LatLng coordinates;
-        if (selectedDestination.equals("Northbound Terminal") ||
-                selectedDestination.equals("San-Agustin Route") ||
-                selectedDestination.equals("Bata Route")) {
-            coordinates = nearestCoordinate;
-        } else {
-            coordinates = new LatLng(0, 0); // Default coordinates if destination is not found
+        switch (selectedDestination) {
+            case "Northbound Terminal":
+                coordinates = new LatLng(10.707659998737006, 122.96218916932654);
+                coordinates = nearestCoordinate;
+                break;
+
+            case "Southbound Terminal":
+                coordinates = new LatLng(10.66245869801277, 122.95577918356845);
+                coordinates = nearestCoordinate;
+                break;
+
+            case "University of St. La Salle":
+                coordinates = new LatLng(10.678726125664706, 122.96262791458304);
+                coordinates = nearestCoordinate;
+                break;
+
+            default:
+                coordinates = new LatLng(0, 0); // Default coordinates if destination is not found
+                break;
         }
 
         return coordinates;
