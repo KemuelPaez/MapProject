@@ -11,14 +11,14 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.ProgressBar;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class StartActivity extends AppCompatActivity {
 
-    private ProgressBar mLoadingSpinner;
+    ImageView loadingGif;
     Button startButton, exitButton;
 
     @Override
@@ -29,8 +29,7 @@ public class StartActivity extends AppCompatActivity {
         TextView loadingText = findViewById(R.id.loading_text);
         loadingText.setVisibility(View.GONE);
 
-        mLoadingSpinner = findViewById(R.id.loading_spinner);
-        mLoadingSpinner.setVisibility(View.GONE);
+        loadingGif = findViewById(R.id.loading_gif);
 
         startButton = findViewById(R.id.start_button);
         exitButton = findViewById(R.id.exit_button);
@@ -59,8 +58,10 @@ public class StartActivity extends AppCompatActivity {
                         .setNeutralButton("Start anyway", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 // show the loading spinner and text
-                                mLoadingSpinner.setVisibility(View.VISIBLE);
                                 loadingText.setVisibility(View.VISIBLE);
+                                loadingGif.setVisibility(View.VISIBLE);
+                                startButton.setEnabled(false);
+                                exitButton.setEnabled(false);
 
                                 Animation alphaAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.alpha_anim);
                                 alphaAnimation.setRepeatCount(Animation.INFINITE);

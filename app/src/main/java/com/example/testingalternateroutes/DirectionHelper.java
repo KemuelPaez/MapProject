@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class DirectionHelper {
-
     private final GoogleMap mMap;
     private final MainActivity mainActivity;
     private Polyline[] polylines;
@@ -60,10 +59,10 @@ public class DirectionHelper {
                     DirectionsRoute route = result.routes[i];
                     Polyline polyline = createPolyline(route);
                     if (i == getShortestRouteIndex(result.routes)) {
-                        polyline.setColor(Color.BLUE);
+                        polyline.setColor(Color.GRAY);
                         polyline.setZIndex(0);
                     } else {
-                        polyline.setColor(Color.GRAY);
+                        polyline.setColor(Color.RED);
                         polyline.setZIndex(0);
                     }
                     polylines[i] = polyline;
@@ -71,7 +70,7 @@ public class DirectionHelper {
                 LatLngBounds bounds = getLatLngBounds(polylines);
                 mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
                 mainActivity.hideLoadingScreenAndEnableButton();
-                getNearestRouteChecker(origin);
+                getNearestRouteChecker(origin, destination);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -90,7 +89,7 @@ public class DirectionHelper {
         List<LatLng> path = decodePolyline(route.overviewPolyline.getEncodedPath());
         return mMap.addPolyline(new PolylineOptions()
                 .addAll(path)
-                .width(10f)
+                .width(6f)
                 .pattern(pattern));
     }
     private List<LatLng> decodePolyline(String encodedPath) {
@@ -130,10 +129,11 @@ public class DirectionHelper {
 
         return shortestRouteIndex;
     }
-    private void getNearestRouteChecker(LatLng destination){
+    private void getNearestRouteChecker(LatLng userLocation, LatLng destination) {
         // A checker method if the user is within the nearest route to be recommended
-        LatLng nearestCoordinate = LatLngData.getNearestCoordinate(destination);
-        PolylineOptions polylineOptions = new PolylineOptions().width(10f).color(Color.RED);
+        String colorHex = "#153d6e";
+        LatLng nearestCoordinate = LatLngData.getNearestCoordinate(userLocation, destination);
+        PolylineOptions polylineOptions = new PolylineOptions().width(12f).color(Color.parseColor(colorHex));
 
         if (nearestCoordinate != null) {
             // Check if the nearest coordinate is on the nearest point of route & display the route
@@ -170,7 +170,7 @@ public class DirectionHelper {
                     polylineOptions.add(point);
                 }
                 mMap.addPolyline(polylineOptions);
-                
+
             } else if (isCoordinateOnErorecoRoute(nearestCoordinate)){
                 showRouteSuggestionDialog("Eroreco");
 
@@ -230,7 +230,30 @@ public class DirectionHelper {
                     polylineOptions.add(point);
                 }
                 mMap.addPolyline(polylineOptions);
+            } else if (isCoordinateOnHandumananRoute(nearestCoordinate)){
+                showRouteSuggestionDialog("Handumanan");
 
+                LatLng[] handuPoints = LatLngData.getLatLngHandumananPoints();
+                // mMap.clear();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(handuPoints[0], 12));
+
+                for (LatLng point : handuPoints) {
+                    polylineOptions.add(point);
+                }
+                mMap.addPolyline(polylineOptions);
+            } else if (isCoordinateOnBanagoRoute(nearestCoordinate)){
+                showRouteSuggestionDialog("Banago");
+
+                LatLng[] banagoPoints = LatLngData.getLatLngBanagoPoints();
+                // mMap.clear();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(banagoPoints[0], 12));
+
+                for (LatLng point : banagoPoints) {
+                    polylineOptions.add(point);
+                }
+                mMap.addPolyline(polylineOptions);
+            } else {
+                return;
             }
         }
     }
@@ -238,8 +261,9 @@ public class DirectionHelper {
         // placeholder if nearest route is suggested
         AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
         builder.setTitle("Route Suggestion")
-                .setMessage("We suggest taking the " + routeName + " jeepney route. The red line routes indicates the route of the "+ routeName
-                        +" jeepneys. Possible double ride if you want to get to your specific location.")
+                .setMessage("We suggest taking the " + routeName + " jeepney route. The blue line routes indicates the route of the "+ routeName
+                        +" jeepneys, And the jagged lines are possible ways for you to traverse via walking/driving." +
+                        " Possible double ride if you want to get to your specific location.")
                 .setPositiveButton("OK", (dialog, which) -> {
 
                 })
@@ -332,9 +356,33 @@ public class DirectionHelper {
     }
     private boolean isCoordinateOnAlijisRoute(LatLng coordinate) {
         // check if coordinate is on the bata route
-        LatLng[] alijisCoordinates = LatLngData.getLatLngAlijisPoints();
+        LatLng[] mansiCoordinates = LatLngData.getLatLngMansilinganPoints();
 
-        for (LatLng point : alijisCoordinates) {
+        for (LatLng point : mansiCoordinates) {
+            if (areCoordinatesEqual(point, coordinate)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    private boolean isCoordinateOnHandumananRoute(LatLng coordinate) {
+        // check if coordinate is on the bata route
+        LatLng[] handuCoordinates = LatLngData.getLatLngHandumananPoints();
+
+        for (LatLng point : handuCoordinates) {
+            if (areCoordinatesEqual(point, coordinate)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    private boolean isCoordinateOnBanagoRoute(LatLng coordinate) {
+        // check if coordinate is on the bata route
+        LatLng[] banagoCoordinates = LatLngData.getLatLngBanagoPoints();
+
+        for (LatLng point : banagoCoordinates) {
             if (areCoordinatesEqual(point, coordinate)) {
                 return true;
             }
