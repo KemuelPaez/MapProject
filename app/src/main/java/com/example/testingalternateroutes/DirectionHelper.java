@@ -2,6 +2,7 @@ package com.example.testingalternateroutes;
 
 import android.app.AlertDialog;
 import android.graphics.Color;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -28,14 +29,14 @@ public class DirectionHelper {
     private final GoogleMap mMap;
     private final MainActivity mainActivity;
     private Polyline[] polylines;
-
     public DirectionHelper(GoogleMap googleMap, MainActivity activity) {
         // Initiate maps
         mMap = googleMap;
         mainActivity = activity;
+
     }
 
-    public void showDirections(LatLng origin, LatLng destination) {
+    public void showDirections(LatLng origin, LatLng destination, TextView jeepRoute) {
 
         // Request from the GeoAPI
         GeoApiContext context = new GeoApiContext.Builder()
@@ -70,7 +71,7 @@ public class DirectionHelper {
                 LatLngBounds bounds = getLatLngBounds(polylines);
                 mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
                 mainActivity.hideLoadingScreenAndEnableButton();
-                getNearestRouteChecker(origin, destination);
+                getNearestRouteChecker(origin, destination, jeepRoute);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,6 +92,8 @@ public class DirectionHelper {
                 .addAll(path)
                 .width(6f)
                 .pattern(pattern));
+
+
     }
     private List<LatLng> decodePolyline(String encodedPath) {
         // decode the polylines on the array
@@ -129,16 +132,16 @@ public class DirectionHelper {
 
         return shortestRouteIndex;
     }
-    private void getNearestRouteChecker(LatLng userLocation, LatLng destination) {
+    private void getNearestRouteChecker(LatLng userLocation, LatLng destination, TextView jeepRoute) {
         // A checker method if the user is within the nearest route to be recommended
         String colorHex = "#153d6e";
         LatLng nearestCoordinate = LatLngData.getNearestCoordinate(userLocation, destination);
-        PolylineOptions polylineOptions = new PolylineOptions().width(12f).color(Color.parseColor(colorHex));
+        PolylineOptions polylineOptions = new PolylineOptions().width(13f).color(Color.parseColor(colorHex));
 
         if (nearestCoordinate != null) {
             // Check if the nearest coordinate is on the nearest point of route & display the route
             if (isCoordinateOnNboundRoute(nearestCoordinate)) {
-                showRouteSuggestionDialog("Northbound");
+                showRouteSuggestionDialog("Northbound", jeepRoute);
                 LatLng[] nboundPoints = LatLngData.getLatLngNboundPoints();
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(nboundPoints[0], 12));
 
@@ -149,7 +152,7 @@ public class DirectionHelper {
                 mMap.addPolyline(polylineOptions);
 
             } else if (isCoordinateOnSanagRoute(nearestCoordinate)){
-                showRouteSuggestionDialog("San-Agustin");
+                showRouteSuggestionDialog("San-Agustin", jeepRoute);
                 LatLng[] sanagPoints = LatLngData.getLatLngSanagPoints();
                 //  mMap.clear();
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sanagPoints[0], 12));
@@ -160,7 +163,7 @@ public class DirectionHelper {
                 mMap.addPolyline(polylineOptions);
 
             } else if (isCoordinateOnBataRoute(nearestCoordinate)){
-                showRouteSuggestionDialog("Bata");
+                showRouteSuggestionDialog("Bata", jeepRoute);
 
                 LatLng[] bataPoints = LatLngData.getLatLngBataPoints();
                 // mMap.clear();
@@ -171,20 +174,8 @@ public class DirectionHelper {
                 }
                 mMap.addPolyline(polylineOptions);
 
-            } else if (isCoordinateOnErorecoRoute(nearestCoordinate)){
-                showRouteSuggestionDialog("Eroreco");
-
-                LatLng[] erorecoPoints = LatLngData.getLatLngErorecoPoints();
-                // mMap.clear();
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(erorecoPoints[0], 12));
-
-                for (LatLng point : erorecoPoints) {
-                    polylineOptions.add(point);
-                }
-                mMap.addPolyline(polylineOptions);
-
             } else if (isCoordinateOnFortuneTownRoute(nearestCoordinate)){
-                showRouteSuggestionDialog("Fortune Town");
+                showRouteSuggestionDialog("Fortune Town", jeepRoute);
 
                 LatLng[] fortunePoints = LatLngData.getLatLngFortuneTownPoints();
                 // mMap.clear();
@@ -196,7 +187,7 @@ public class DirectionHelper {
                 mMap.addPolyline(polylineOptions);
 
             } else if (isCoordinateOnLasalleRoute(nearestCoordinate)){
-                showRouteSuggestionDialog("Lasalle");
+                showRouteSuggestionDialog("Lasalle", jeepRoute);
 
                 LatLng[] lasallePoints = LatLngData.getLatLngLasallePoints();
                 // mMap.clear();
@@ -208,7 +199,7 @@ public class DirectionHelper {
                 mMap.addPolyline(polylineOptions);
 
             } else if (isCoordinateOnMansilinganRoute(nearestCoordinate)){
-                showRouteSuggestionDialog("Mansilingan");
+                showRouteSuggestionDialog("Mansilingan", jeepRoute);
 
                 LatLng[] mansiPoints = LatLngData.getLatLngMansilinganPoints();
                 // mMap.clear();
@@ -220,7 +211,7 @@ public class DirectionHelper {
                 mMap.addPolyline(polylineOptions);
 
             } else if (isCoordinateOnAlijisRoute(nearestCoordinate)){
-                showRouteSuggestionDialog("Alijis");
+                showRouteSuggestionDialog("Alijis", jeepRoute);
 
                 LatLng[] alijisPoints = LatLngData.getLatLngAlijisPoints();
                 // mMap.clear();
@@ -231,7 +222,7 @@ public class DirectionHelper {
                 }
                 mMap.addPolyline(polylineOptions);
             } else if (isCoordinateOnHandumananRoute(nearestCoordinate)){
-                showRouteSuggestionDialog("Handumanan");
+                showRouteSuggestionDialog("Handumanan", jeepRoute);
 
                 LatLng[] handuPoints = LatLngData.getLatLngHandumananPoints();
                 // mMap.clear();
@@ -242,7 +233,7 @@ public class DirectionHelper {
                 }
                 mMap.addPolyline(polylineOptions);
             } else if (isCoordinateOnBanagoRoute(nearestCoordinate)){
-                showRouteSuggestionDialog("Banago");
+                showRouteSuggestionDialog("Banago", jeepRoute);
 
                 LatLng[] banagoPoints = LatLngData.getLatLngBanagoPoints();
                 // mMap.clear();
@@ -257,7 +248,7 @@ public class DirectionHelper {
             }
         }
     }
-    private void showRouteSuggestionDialog(String routeName) {
+    private void showRouteSuggestionDialog(String routeName, TextView jeepRoute) {
         // placeholder if nearest route is suggested
         AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
         builder.setTitle("Route Suggestion")
@@ -265,7 +256,8 @@ public class DirectionHelper {
                         +" jeepneys, And the jagged lines are possible ways for you to traverse via walking/driving." +
                         " Possible double ride if you want to get to your specific location.")
                 .setPositiveButton("OK", (dialog, which) -> {
-
+                    // pass the suggested routename to textview
+                    jeepRoute.setText(routeName);
                 })
                 .setCancelable(false)
                 .show();
@@ -299,18 +291,6 @@ public class DirectionHelper {
         LatLng[] bataCoordinates = LatLngData.getLatLngBataPoints();
 
         for (LatLng point : bataCoordinates) {
-            if (areCoordinatesEqual(point, coordinate)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-    private boolean isCoordinateOnErorecoRoute(LatLng coordinate) {
-        // check if coordinate is on the bata route
-        LatLng[] erorecoCoordinates = LatLngData.getLatLngErorecoPoints();
-
-        for (LatLng point : erorecoCoordinates) {
             if (areCoordinatesEqual(point, coordinate)) {
                 return true;
             }

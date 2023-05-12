@@ -12,6 +12,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private Spinner destinationSpinner;
     public Button btnDirections;
+    public TextView jeepRoute;
     private ImageButton btnClear;
 
     private DirectionHelper directionHelper;
@@ -48,23 +51,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         btnDirections = findViewById(R.id.btn_directions);
         btnDirections.setEnabled(false);
         btnClear = findViewById(R.id.btn_clear);
-
+        jeepRoute = findViewById(R.id.jeep_route);
         destinationSpinner = findViewById(R.id.spinner_destination);
+
         ArrayAdapter<String> destinationAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
         destinationSpinner.setAdapter(destinationAdapter);
 
         // Placeholder for hotspot destinations
         destinationAdapter.add("Choose a destination . . .");
+        // Terminals
         destinationAdapter.add("Northbound Terminal");
         destinationAdapter.add("Southbound Terminal");
-        destinationAdapter.add("Robinsons Mandalagan");
-        destinationAdapter.add("Riverside College");
-        destinationAdapter.add("San-Agustin");
+        // Schools
         destinationAdapter.add("University of St. La Salle");
+        destinationAdapter.add("Riverside College");
+        destinationAdapter.add("Colegio San-Agustin");
+        destinationAdapter.add("STI West Negros");
+        // Malls
+        destinationAdapter.add("Robinsons Triangle");
         destinationAdapter.add("SM City Bacolod");
-        destinationAdapter.add("888 China-Town");
-        destinationAdapter.add("Cyber Center");
-        destinationAdapter.add("City Mall - Mandalagan");
+        destinationAdapter.add("Lopues San Sebastian");
+        destinationAdapter.add("Ayala Malls Capitol");
+        // Hospitals
+        destinationAdapter.add("Corazon Locsin Montelibano Hospital");
+        destinationAdapter.add("Metro Bacolod Hospital");
+        // Church
+        destinationAdapter.add("San Sebastian Cathedral");
 
         // Call the map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -85,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } else {
                     String selectedDestination = destinationSpinner.getSelectedItem().toString();
                     getCurrentLocation(selectedDestination);
+
                 }
             }
         });
@@ -109,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Enable zoom controls
         mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.setMaxZoomPreference(12);
 
         // Enable the "My Location" button
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -128,7 +142,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Set the camera position to show the bounds while waiting for the map to load
         mMap.setOnMapLoadedCallback(() -> mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bacolodBounds, 100)));
 
-        btnClear.setOnClickListener(v -> mMap.clear());
+        btnClear.setOnClickListener(v -> {
+            mMap.clear();
+            jeepRoute.setText("- - - -");
+            Toast.makeText(MainActivity.this, "Map Cleared!", Toast.LENGTH_SHORT).show();
+        });
 
         // Display the spinner
         selectRouteSpinner();
@@ -168,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     LatLng destination = getDestinationLatLng(selectedDestination, origin);
 
                     // Call showDirections()
-                    directionHelper.showDirections(origin, destination);
+                    directionHelper.showDirections(origin, destination, jeepRoute);
                 }
 
             }
@@ -204,34 +222,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 break;
 
                             case "Southbound Terminal":
-                                LatLng sbound = new LatLng(10.66245869801277, 122.95577918356845);
+                                LatLng sbound = new LatLng(10.66756766693566, 122.95817815957436);
                                 mMap.clear();
                                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sbound, 12));
                                 mMap.addMarker(new MarkerOptions().position(sbound).title("Southbound Terminal"));
-                                btnDirections.setEnabled(true);
-                                break;
-
-                            case "Robinsons Mandalagan":
-                                LatLng rob = new LatLng(10.690927897527251, 122.95898764824393);
-                                mMap.clear();
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(rob, 12));
-                                mMap.addMarker(new MarkerOptions().position(rob).title("Robinsons Mandalagan"));
-                                btnDirections.setEnabled(true);
-                                break;
-
-                            case "Riverside College":
-                                LatLng riverCollege = new LatLng(10.682625481061589, 122.95778065418398);
-                                mMap.clear();
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(riverCollege, 12));
-                                mMap.addMarker(new MarkerOptions().position(riverCollege).title("Riverside College"));
-                                btnDirections.setEnabled(true);
-                                break;
-
-                            case "San-Agustin":
-                                LatLng sanag = new LatLng(10.681739876603684, 122.95790940022039);
-                                mMap.clear();
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sanag, 12));
-                                mMap.addMarker(new MarkerOptions().position(sanag).title("San-Agustin"));
                                 btnDirections.setEnabled(true);
                                 break;
 
@@ -243,35 +237,83 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 btnDirections.setEnabled(true);
                                 break;
 
+                            case "Riverside College":
+                                LatLng river = new LatLng(10.670306561428967, 122.96512790774199);
+                                mMap.clear();
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(river, 12));
+                                mMap.addMarker(new MarkerOptions().position(river).title("Riverside College"));
+                                btnDirections.setEnabled(true);
+                                break;
+
+                            case "Colegio San-Agustin":
+                                LatLng sanag = new LatLng(10.681414072379999, 122.95811847249533);
+                                mMap.clear();
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sanag, 12));
+                                mMap.addMarker(new MarkerOptions().position(sanag).title("Colegio San-Agustin"));
+                                btnDirections.setEnabled(true);
+                                break;
+
+                            case "STI West Negros":
+                                LatLng sti = new LatLng(10.668829817338267, 122.95701733496746);
+                                mMap.clear();
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sti, 12));
+                                mMap.addMarker(new MarkerOptions().position(sti).title("STI West Negros"));
+                                btnDirections.setEnabled(true);
+                                break;
+
+                            case "Robinsons Triangle":
+                                LatLng rob = new LatLng(10.674525150258413, 122.96130982243098);
+                                mMap.clear();
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(rob, 12));
+                                mMap.addMarker(new MarkerOptions().position(rob).title("Robinsons Triangle"));
+                                btnDirections.setEnabled(true);
+                                break;
+
                             case "SM City Bacolod":
-                                LatLng sm = new LatLng(10.67028960557052, 122.94326470877894);
+                                LatLng sm = new LatLng(10.670991978094452, 122.94419443642798);
                                 mMap.clear();
                                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sm, 12));
                                 mMap.addMarker(new MarkerOptions().position(sm).title("SM City Bacolod"));
                                 btnDirections.setEnabled(true);
                                 break;
 
-                            case "888 China-Town":
-                                LatLng chinaT = new LatLng(10.673431658688017, 122.94928373383625);
+                            case "Lopues San Sebastian":
+                                LatLng lopues = new LatLng(10.666409116421695, 122.94431732174264);
                                 mMap.clear();
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(chinaT, 12));
-                                mMap.addMarker(new MarkerOptions().position(chinaT).title("888 China-Town"));
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lopues, 12));
+                                mMap.addMarker(new MarkerOptions().position(lopues).title("Lopues San Sebastian"));
                                 btnDirections.setEnabled(true);
                                 break;
 
-                            case "Cyber Center":
-                                LatLng cc = new LatLng(10.661777088993766, 122.9471210932099);
+                            case "Ayala Malls Capitol":
+                                LatLng ayala = new LatLng(10.676798889527337, 122.95070771290528);
                                 mMap.clear();
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(cc, 12));
-                                mMap.addMarker(new MarkerOptions().position(cc).title("Cyber Center"));
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(ayala, 12));
+                                mMap.addMarker(new MarkerOptions().position(ayala).title("Ayala Malls Capitol"));
                                 btnDirections.setEnabled(true);
                                 break;
 
-                            case "City Mall - Mandalagan":
-                                LatLng cmM = new LatLng(10.695527446631967, 122.96122069253477);
+                            case "Corazon Locsin Montelibano Hospital":
+                                LatLng clmHospital = new LatLng(10.67213087800615, 122.95135751709138);
                                 mMap.clear();
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(cmM, 12));
-                                mMap.addMarker(new MarkerOptions().position(cmM).title("City Mall - Mandalagan"));
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(clmHospital, 12));
+                                mMap.addMarker(new MarkerOptions().position(clmHospital).title("Corazon Locsin Montelibano Hospital"));
+                                btnDirections.setEnabled(true);
+                                break;
+
+                            case "Metro Bacolod Hospital":
+                                LatLng mbh = new LatLng(10.660875612177502, 122.98509013687979);
+                                mMap.clear();
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mbh, 12));
+                                mMap.addMarker(new MarkerOptions().position(mbh).title("Metro Bacolod Hospital"));
+                                btnDirections.setEnabled(true);
+                                break;
+
+                            case "San Sebastian Cathedral":
+                                LatLng sanSeb = new LatLng(10.66984235523919, 122.94686393646654);
+                                mMap.clear();
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sanSeb, 12));
+                                mMap.addMarker(new MarkerOptions().position(sanSeb).title("San Sebastian Cathedral"));
                                 btnDirections.setEnabled(true);
                                 break;
 
@@ -299,39 +341,51 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 break;
 
             case "Southbound Terminal":
-                coordinates = new LatLng(10.66245869801277, 122.95577918356845);
-                break;
-
-            case "Robinsons Mandalagan":
-                coordinates = new LatLng(10.690927897527251, 122.95898764824393);
-                break;
-
-            case "Riverside College":
-                coordinates = new LatLng(10.683331854215057, 122.95919686054253);
-                break;
-
-            case "San-Agustin":
-                coordinates = new LatLng(10.681739876603684, 122.95790940022039);
+                coordinates = new LatLng(10.66756766693566, 122.95817815957436);
                 break;
 
             case "University of St. La Salle":
                 coordinates = new LatLng(10.678991164524232, 122.9622192813976);
                 break;
 
+            case "Riverside College":
+                coordinates = new LatLng(10.683244545105675, 122.95884682268951);
+                break;
+
+            case "Colegio San-Agustin":
+                coordinates = new LatLng(10.681414072379999, 122.95811847249533);
+                break;
+
+            case "STI West Negros":
+                coordinates = new LatLng(10.668829817338267, 122.95701733496746);
+                break;
+
+            case "Robinsons Triangle":
+                coordinates = new LatLng(10.674525150258413, 122.96130982243098);
+                break;
+
             case "SM City Bacolod":
-                coordinates = new LatLng(10.67028960557052, 122.94326470877894);
+                coordinates = new LatLng(10.670991978094452, 122.94419443642798);
                 break;
 
-            case "888 China-Town":
-                coordinates = new LatLng(10.673431658688017, 122.94928373383625);
+            case "Lopues San Sebastian":
+                coordinates = new LatLng(10.666409116421695, 122.94431732174264);
                 break;
 
-            case "Cyber Center":
-                coordinates = new LatLng(10.661777088993766, 122.9471210932099);
+            case "Ayala Malls Capitol":
+                coordinates = new LatLng(10.676798889527337, 122.95070771290528);
                 break;
 
-            case "City Mall - Mandalagan":
-                coordinates = new LatLng(10.695527446631967, 122.96122069253477);
+            case "Corazon Locsin Montelibano Hospital":
+                coordinates = new LatLng(10.67213087800615, 122.95135751709138);
+                break;
+
+            case "Metro Bacolod Hospital":
+                coordinates = new LatLng(10.660875612177502, 122.98509013687979);
+                break;
+
+            case "San Sebastian Cathedral":
+                coordinates = new LatLng(10.66984235523919, 122.94686393646654);
                 break;
 
             default:

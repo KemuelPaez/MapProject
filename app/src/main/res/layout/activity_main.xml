@@ -11,33 +11,89 @@
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="528dp"
+        android:layout_height="413dp"
         android:layout_above="@+id/btn_directions"
-        android:layout_marginBottom="147dp" />
+        android:layout_marginBottom="262dp" />
 
-    <Spinner
-        android:id="@+id/spinner_destination"
+    <LinearLayout
+        android:id="@+id/destination_layout"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="16dp"
+        android:orientation="vertical"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="108dp"
-        android:layout_marginBottom="168dp"
-        android:padding="8dp" />
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="120dp">
+
+        <Spinner
+            android:id="@+id/spinner_destination"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="@drawable/rounded_border_spinner"
+            android:spinnerMode="dropdown"
+            android:dropDownVerticalOffset="48dp"
+            android:textColor="@color/black"/>
+
+        <LinearLayout
+            android:id="@+id/jeep_route_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border"
+            android:orientation="vertical"
+            android:padding="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="start">
+
+            <ImageView
+                android:id="@+id/jeep_icon"
+                android:layout_width="40dp"
+                android:layout_height="24dp"
+                android:layout_gravity="start"
+                android:layout_marginRight="1dp"
+                android:src="@drawable/baseline_directions_jeep_24"/>
+
+            <TextView
+                android:id="@+id/jeep_title_route"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/suggest_jeep"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="32dp"/>
+
+            <TextView
+                android:id="@+id/jeep_route"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/jeep_route"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="3dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
     <ImageButton
         android:id="@+id/btn_clear"
-        android:layout_width="100dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="16dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="59dp"
+        android:layout_marginBottom="16dp"
         android:src="@drawable/baseline_delete_forever_24"
-        android:text="@string/clear"
-        app:tint="@color/red" />
+        app:tint="@color/red"
+        android:background="@android:color/transparent"
+        android:contentDescription="Clear Map Button" />
 
     <Button
         android:id="@+id/btn_directions"
@@ -48,8 +104,8 @@
         android:layout_marginTop="16dp"
         android:layout_marginBottom="8dp"
         android:backgroundTint="@color/blue_app"
+        android:textColor="@color/white"
         android:text="@string/get_direction" />
-
 
     <FrameLayout
         android:id="@+id/loading_screen"
@@ -83,6 +139,5 @@
         </LinearLayout>
 
     </FrameLayout>
-
 
 </RelativeLayout>

@@ -25,6 +25,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="16dp"
             android:backgroundTint="@color/blue_app"
+            android:textColor="@color/white"
             android:text="Start" />
 
         <Button
@@ -34,6 +35,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="16dp"
             android:backgroundTint="@color/blue_app"
+            android:textColor="@color/white"
             android:text="Exit" />
 
     </LinearLayout>

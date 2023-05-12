@@ -1,6 +1,8 @@
 <resources>
-    <string name="app_name">TestingAlternateRoutes</string>
+    <string name="app_name">Bacolod Commuters Guide</string>
     <string name="google_maps_key">AIzaSyAioKwOOSrMpBuYj80F-eIsquHfaXMlOtI</string>
     <string name="get_direction">Get Direction</string>
     <string name="clear">CLEAR</string>
+    <string name="suggest_jeep">Jeepney Suggestion:</string>
+    <string name="jeep_route">- - - -</string>
 </resources>
